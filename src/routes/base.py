@@ -1,5 +1,6 @@
 from fastapi import APIRouter,FastAPI
 import os
+from helpers.config import get_settings
 
 
 router = APIRouter(
@@ -9,8 +10,10 @@ router = APIRouter(
 
 @router.get("/")
 async def root():
-    app_name = os.getenv("APP_NAME")
-    app_version = os.getenv("APP_VERSION")
+    settings = get_settings()
+    app_name = settings.APP_NAME
+    app_version = settings.APP_VERSION
+    
     return {
         "message": f"This is the base route of {app_name} version {app_version}"
         }
