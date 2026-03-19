@@ -1,7 +1,7 @@
 
 from helpers.config import get_settings
 import os
-
+import random, string
 
 class BaseController:
 
@@ -11,3 +11,6 @@ class BaseController:
         self.files_dir = os.path.join(
             self.base_dir,'assets/files'
         )
+
+    def generate_unique_string(self,length: int = 8):
+        return "".join(random.choices(string.ascii_letters + string.digits, k=length))
