@@ -6,10 +6,12 @@ import  re ,os
 
 
 class DataController(BaseController):
-    size_scaler = 1048576 # convert form mb to b
+    
     def __init__(self ):
         super().__init__()
+        self.size_scaler = 1048576 # convert form mb to b
 
+        
     def validate_uploaded_file(self,file: UploadFile):
         
         if file.content_type not in self.app_settings.FILE_ALLOWED_TYPE:
@@ -21,7 +23,7 @@ class DataController(BaseController):
         return True, ResponseSignal.FILE_VALIDATION_SUCCESS.value
     
 
-    def generate_unique_filename(self,original_string: str, project_id: str):
+    def generate_unique_filePath(self,original_string: str, project_id: str):
         random_key =self.generate_unique_string()
         cleaned_original_string = self.cleaned_filename(original_string)
         project_dir_path = ProjectController().get_project_path(project_id)
@@ -31,14 +33,14 @@ class DataController(BaseController):
             )
 
         while  os.path.exists(unique_file_path):
-            random_string =self.generate_unique_string()
+            random_key =self.generate_unique_string()
             cleaned_original_string = self.cleaned_filename(original_string)
             project_dir_path = ProjectController().get_project_path(project_id)
             unique_file_path = os.path.join(
                 project_dir_path,
                 random_key + "_" + cleaned_original_string
                 )
-        return unique_file_path
+        return unique_file_path ,random_key + "_" + cleaned_original_string
 
     def cleaned_filename(self,original_file_name: str):
         cleaned_name = re.sub(r'[^\w\.-]', '_', original_file_name.strip())
