@@ -1,8 +1,12 @@
-from fastapi import APIRouter, UploadFile, Depends,status
+from fastapi import APIRouter, UploadFile, Depends,status,Request
 from fastapi.responses import JSONResponse
 from helpers.config import get_settings, Settings
 from controllers import DataController, ProcessController
 from schemas import ProcessRequestSchema
+from models.db_schemas import DataChunk
+from models.ProjectModel import ProjectModel
+from models.ChunkModel import ChunkModel
+
 import aiofiles
 import os
 from models import ResponseSignal
@@ -21,11 +25,14 @@ data_controller = DataController()
 
 @router.post('/upload/{project_id}')
 async def upload_file(
+    request: Request,
     project_id: str,
     file: UploadFile,
     app_settings: Settings = Depends(get_settings)
 ):
     
+    project_model = ProjectModel(db_client=request.app.mongodb)
+    project = await project_model.get_projct_or_create_one(project_id=project_id)
 
     is_valid, signal = data_controller.validate_uploaded_file(file)
 
@@ -58,16 +65,23 @@ async def upload_file(
     return JSONResponse(
         content= {
             "signal" : ResponseSignal.FILE_UPLOAD_SUCCESS.value,
-            "file_id" : file_id
+            "file_id" : file_id,
+            
         }
     )
 
 
 @router.post('/process/{project_id}')
-async def process_file(project_id: str, process_request_schema: ProcessRequestSchema):
+async def process_file(request: Request, project_id: str, process_request_schema: ProcessRequestSchema):
     file_id = process_request_schema.file_id
     chank_size = process_request_schema.chunk_size
     overlap_size = process_request_schema.ovelap_size
+    do_reset = process_request_schema.do_reset
+
+    chunk_model = ChunkModel(db_client=request.app.mongodb)
+    project_model = ProjectModel(db_client=request.app.mongodb)
+    project = await project_model.get_projct_or_create_one(project_id=project_id)
+
 
     process_controller = ProcessController(project_id=project_id)
 
@@ -82,5 +96,28 @@ async def process_file(project_id: str, process_request_schema: ProcessRequestSc
             }
         )
     
+    file_chunk_records = [
+        DataChunk(
+            chunk_text=chunk.page_content,
+            chunck_metadata=chunk.metadata,
+            chunk_order=i+1,
+            chunk_object_id=project.id,
+        )
 
-    return processed_content
+        for i, chunk in enumerate(processed_content)
+    ]
+
+    if do_reset == 1:
+        await chunk_model.delete_chunks_by_projec_id(project.id)
+
+    
+
+    no_of_chunks = await chunk_model.insert_many_chunks(file_chunk_records)
+
+    return JSONResponse(
+        content= {
+            "signal" : ResponseSignal.FILE_PROCESSING_SUCCESS.value,
+            "file_id" : file_id,
+            "number_of_chunks": no_of_chunks
+        }
+    )
