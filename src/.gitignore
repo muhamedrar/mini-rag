@@ -67,4 +67,3 @@ env/
 # Project specific
 *.log
 data/
-models/
