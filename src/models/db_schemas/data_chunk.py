@@ -22,7 +22,7 @@ class DataChunk(BaseModel):
                 "key":[
                     ("chunk_object_id",1)
                 ],
-                "name": "chunk_object_id_index_!",
+                "name": "chunk_object_id_index_1",
                 "unique": False
             }
         ]

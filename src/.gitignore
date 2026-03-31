@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-.vscode
+../vscode
 # C extensions
 *.so
 
@@ -67,3 +67,4 @@ env/
 # Project specific
 *.log
 data/
+

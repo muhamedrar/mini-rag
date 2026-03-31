@@ -25,7 +25,7 @@ class ProjectModel(BaseDataModel):
             self.collection = self.db_client[DbEnums.COLLECTION_PROJECT_NAME.value]
             indexes = Project.get_indexes()
             for index in indexes:
-                await self.collection.creat_index(
+                await self.collection.create_index(
                     index['key'],
                     name=index['name'],
                     unique=index['unique']
