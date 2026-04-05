@@ -7,7 +7,8 @@ class DataChunk(BaseModel):
     chunk_text: str = Field(..., min_length=1)
     chunck_metadata: dict
     chunk_order: int = Field(..., gt=0)
-    chunk_object_id: ObjectId
+    chunk_assit_id: ObjectId
+    chunk_project_id: ObjectId
 
 
     class Config:
@@ -20,7 +21,7 @@ class DataChunk(BaseModel):
         return [
             {
                 "key":[
-                    ("chunk_object_id",1)
+                    ("chunk_project_id",1)
                 ],
                 "name": "chunk_object_id_index_1",
                 "unique": False
