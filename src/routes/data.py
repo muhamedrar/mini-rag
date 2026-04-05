@@ -98,13 +98,25 @@ async def process_file(request: Request, project_id: str, process_request_schema
     chunk_model = await ChunkModel.create_instance(db_client=request.app.mongodb)
     project_model = await ProjectModel.create_instance(db_client=request.app.mongodb)
     project = await project_model.get_projct_or_create_one(project_id=project_id)
-    
-   
+    asset_model =await AssetModel.create_instance(db_client=request.app.mongodb)
+
     project_files_ids = {}
     if process_request_schema.file_id:
-        project_files_ids = [process_request_schema.file_id]
+        asset_record = await asset_model.get_asset_record(asset_project_id=project.id, asset_name=process_request_schema.file_id)
+        if asset_record is None:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content= {
+                    "signal" : ResponseSignal.FILE_NOT_FOUND_WITH_THIS_ID.value
+                }
+            )
+        
+
+
+        project_files_ids = {
+            asset_record.id: asset_record.asset_name
+        }
     else:
-        asset_model =await AssetModel.create_instance(db_client=request.app.mongodb)
         project_files = await asset_model.get_all_project_assets(asset_project_id=project.id, asset_type=AssetTypesEnums.FILE.value)
         project_files_ids = {
             file.id: file.asset_name for file in project_files
