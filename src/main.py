@@ -1,4 +1,4 @@
-from fastapi import FastAPI,__version__
+from fastapi import FastAPI,__version__,APIRouter, UploadFile
 from routes import info ,data
 from motor.motor_asyncio import AsyncIOMotorClient
 from helpers.config import get_settings
@@ -28,4 +28,12 @@ app.include_router(info.router)
 app.include_router(data.router)
 
 
+
+router = APIRouter()
+@router.post("/test")
+async def upload_file(file: UploadFile):
+    
+    return {"filename": file.filename}
+
+app.include_router(router)
 
