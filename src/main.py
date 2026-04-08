@@ -3,7 +3,7 @@ from routes import info ,data
 from motor.motor_asyncio import AsyncIOMotorClient
 from helpers.config import get_settings
 from contextlib import asynccontextmanager
-
+from stores import LLmFactory 
 
 
 
@@ -14,6 +14,14 @@ async def lifespan(app: FastAPI):
     app.mongodb = app.mongodb_conn[settings.MONGODB_db]
     print("mongo db startup complete.")
 
+    llm_factory = LLmFactory(settings)
+    app.llm_client = llm_factory.create_provider(provider_name= settings.GENERATION_BACKEND)
+    app.llm_client.set_generation_model(settings.GENERATION_MODEL_ID)
+    print("LLM startup complete")
+
+    app.embed_client = llm_factory.create_provider(provider_name= settings.EMBEDING_BACKEND)
+    app.embed_client.set_embedding_model(settings.EMBEDDING_MODEL_ID)
+    print("embeding model startup complete")
 
     yield
 
@@ -29,11 +37,4 @@ app.include_router(data.router)
 
 
 
-router = APIRouter()
-@router.post("/test")
-async def upload_file(file: UploadFile):
-    
-    return {"filename": file.filename}
-
-app.include_router(router)
 
