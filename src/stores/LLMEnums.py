@@ -3,6 +3,7 @@ from enum import Enum
 class LLMType(Enum):
     OPENAI = "OpenAI"
     COHERE = "Cohere"
+    OLLAMA = "Ollama"
 
 
 class OpenAiEnums(Enum):
@@ -18,6 +19,10 @@ class CohereEnums(Enum):
     DOCUMENT = "search_document"
     QUERY = "search_query"
 
+class OllamaEnums(Enum):
+    ROLE_SYSTEM = "system"
+    ROLE_USER = "user"
+    ROLE_ASSISTANT = "assistant"
 
 class DocumentTypeEnums(Enum):
     DOCUMENT = "document"
