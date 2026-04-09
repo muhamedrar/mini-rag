@@ -1,7 +1,7 @@
 import cohere 
-from ...LLMinterface import LLMInterface
+from ..LLMinterface import LLMInterface
 import logging
-from ...LLMEnums import CohereEnums, DocumentTypeEnums
+from ..LLMEnums import CohereEnums, DocumentTypeEnums
 
 
 class CohereProvider(LLMInterface):
