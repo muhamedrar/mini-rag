@@ -1,8 +1,8 @@
 
 from pydantic_settings import BaseSettings
-
+from typing import Optional
 class Settings(BaseSettings):
-    OPENAI_API_KEY: str
+    
     APP_NAME: str
     APP_VERSION: str
 
@@ -16,21 +16,22 @@ class Settings(BaseSettings):
     GENERATION_BACKEND : str
     EMBEDING_BACKEND : str
 
-    OPENAI_API_KEY: str = None
-    OPENAI_URI: str = None
-    COHERE_API_KEY: str = None
-    OLLAMA_API_KEY: str = None
-    OLLAMA_API_URL: str = None
-    GENERATION_MODEL_ID: str = None
-    EMBEDDING_MODEL_ID: str = None
-    EMBEDDING_MODEL_SIZE: int = None
-    INPUT_DEFAULT_MAX_CHARACTERS: int = None
-    DEFAULT_OUTPUT_MAX_TOKENS: int = None
-    DEFAULT_TEMPERATURE: float = None
+    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_URI: Optional[str] = None
+    COHERE_API_KEY: Optional[str] = None
+    OLLAMA_API_KEY: Optional[str] = None
+    OLLAMA_API_URL: Optional[str] = None
+    GENERATION_MODEL_ID: Optional[str] = None
+    EMBEDDING_MODEL_ID: Optional[str] = None
+    EMBEDDING_MODEL_SIZE: Optional[int] = None
+    INPUT_DEFAULT_MAX_CHARACTERS: Optional[int] = None
+    GENERATION_DEFAULT_MAX_TOKEN: Optional[int] = None
+    DEFAULT_TEMPERATURE: Optional[float] = None
 
+    VECTOR_DISTANCE_METHOD: Optional[str] = None
     VECTOR_DB_BACKEND: str
     VECTOR_DB_PATH: str 
-    VECTOR_DISTANCE_METHOD: str = None
+    
     
 
 

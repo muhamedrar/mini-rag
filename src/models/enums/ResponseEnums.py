@@ -14,3 +14,8 @@ class ResponseSignal(Enum):
     NO_FILES_TO_PROCESS = "No files to process for the given project."
 
     FILE_NOT_FOUND_WITH_THIS_ID = "No file found with the provided file_id in the project."
+
+    PROJECT_NOT_FOUND_ERROR = "Project with the given ID does not exist."
+
+    VECTOR_DB_INDEXING_ERROR = "An error occurred while indexing data into the vector database."
+    VECTOR_DB_INDEXING_SUCCESS = "Data indexed into the vector database successfully."
