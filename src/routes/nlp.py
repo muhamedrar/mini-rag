@@ -8,6 +8,7 @@ from controllers import NlpController
 from models.enums.ResponseEnums import ResponseSignal
 from stores.vectorDb.VectorDbFactory import VectorDbFactory
 from helpers.config import get_settings
+from bson import ObjectId
 logger = logging.getLogger('uvicorn.error')
 
 
@@ -39,32 +40,26 @@ async def index_project( request:Request,project_id:str, nlp_push_schema : NlpPu
         embed_client =  request.app.embed_client
     )
 
-    collection_name = nlp_controller.create_collection_name(project_id=project_id)
-    settings = get_settings()
-
-    vector_db = VectorDbFactory(settings=settings)
-
-    if not vector_db.is_collection_exist(collection_name=collection_name):
-        _ = vector_db.create_collection(
-            collection_name=collection_name,
-            embedding_dimension=request.app.embed_client.embedding_model_size,
-            do_reset=False
-        )
-    
-
- 
-    has_reset = True
     page_number = 1
     inserted_chunks_count = 0
-    while has_reset:
-        page_chunks = await chunk_model.get_project_chunks(project_id=project.id, page=page_number)
-        if len(page_chunks):
-            page_number += 1
+    idx = 0
 
-        if len(page_chunks) == 0:
-            has_reset = False
+
+    while True:
+        page_chunks = await chunk_model.get_project_chunks(project_id=project.id, page=page_number)
+        print(f"Fetched {len(page_chunks)} chunks for page {page_number}.")
+        if len(page_chunks):
+            logger.info(f"Fetched {len(page_chunks)} chunks for page {page_number}.")
+            page_number += 1
+        if not page_chunks:
+            
+            logger.info(f"No more chunks to fetch for page {page_number}. Ending pagination.")
             break
-        is_inserted = nlp_controller.index_into_vector_db(project=project, data_chunks=page_chunks, do_reset=nlp_push_schema.do_reset)
+
+        chunks_ids = list(range(idx, idx + len(page_chunks)))
+        idx += len(page_chunks)
+
+        is_inserted = nlp_controller.index_into_vector_db(project=project, data_chunks=page_chunks, do_reset=nlp_push_schema.do_reset,chunk_ids=chunks_ids)
 
         if not is_inserted:
             return JSONResponse(

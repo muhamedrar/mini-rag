@@ -1,11 +1,12 @@
 from .BaseController import BaseController
 from models.db_schemas import Project, DataChunk
 from stores.llms.LLMEnums import DocumentTypeEnums
+from typing import List
 
 
 class NlpController(BaseController):
-    def _init__(self,vector_db_client, llm_client, embed_client):
-        super.__init__()
+    def __init__(self, vector_db_client, llm_client, embed_client):
+        super().__init__()
 
         self.vector_db_client = vector_db_client
         self.llm_client = llm_client
@@ -24,13 +25,13 @@ class NlpController(BaseController):
         return self.vector_db_client.get_collection_info(collection_name=collection_name)
     
 
-    def index_into_vector_db(self, project: Project, data_chunks: list[DataChunk], do_reset: bool = False):
+    def index_into_vector_db(self, project: Project, chunk_ids:List[int] , data_chunks: list[DataChunk], do_reset: bool = False):
         collection_name = self.create_collection_name(project_id=project.project_id)
 
-        texts = [chunk.text for chunk in data_chunks]
-        metadatas = [chunk.metadata for chunk in data_chunks]
+        texts = [chunk.chunk_text for chunk in data_chunks]
+        metadatas = [chunk.chunck_metadata for chunk in data_chunks]
         vectors = [
-            self.embed_client.get_embedding(text=text, document_type=DocumentTypeEnums.DOCUMENT.value)
+            self.embed_client.embed_text(text=text, document_type=DocumentTypeEnums.DOCUMENT.value)
             for text in texts
         ]
 
@@ -42,6 +43,7 @@ class NlpController(BaseController):
 
 
         _ = self.vector_db_client.insert_many(
+            record_ids=chunk_ids,
             collection_name=collection_name,
             text=texts,
             vector=vectors,

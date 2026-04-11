@@ -50,6 +50,7 @@ class QdrantDb(VectorDbInterface):
             _=self.delete_collection(collection_name)
         if not self.is_collection_exist(collection_name):
             _=self.client.create_collection(
+                collection_name=collection_name,
                 vectors_config=models.VectorParams(size=embedding_dimension, distance=self.distance_method)
 
             )
@@ -58,17 +59,17 @@ class QdrantDb(VectorDbInterface):
     
 
     
-    def insert_one(self, collection_name: str, text: str, vector: list, metadata: dict=None, record_id: str=None):
+    def insert_one(self, collection_name: str, text: str, vector: List, metadata: dict=None, record_id: str=None):
         if not self.is_collection_exist(collection_name):
             self.logger.error(f"could not insert record to collection {collection_name} because it does not exist")
             return False
         
         try:
-            _= self.client.upload_points(
+            _= self.client.upsert(
                 collection_name=collection_name,
                 points=[
                     models.PointStruct(
-                        
+                        id=record_id,
                         vector=vector,
                         payload={
                             "text": text,
@@ -84,32 +85,33 @@ class QdrantDb(VectorDbInterface):
 
 
     
-    def insert_many(self, collection_name: str, text: list, vector: list, record_ids: list,  metadata: list=None, batch_size: int=50):
+    def insert_many(self, collection_name: str, text: List, vector: List, record_ids: List,  metadata: List=None, batch_size: int=50):
         
         if metadata is None:
             metadata = [None] * len(text)
         if record_ids is None:
-            record_ids = [None] * len(text)
+            record_ids = list(range(0,len(text)))
         
         for i in range(0, len(text), batch_size):
             batch_text = text[i:i+batch_size]
             batch_vector = vector[i:i+batch_size]
             batch_metadata = metadata[i:i+batch_size]
-
+            record_ids_batch = record_ids[i:i+batch_size]
+            
             batch_records =[
                 models.PointStruct(
-                    
+                    id=record_ids_batch[x],
                     vector=batch_vector[x],
                     payload={
                         "text": batch_text[x],
                         "metadata": batch_metadata[x]
                     }
                 )
-                for x in len(batch_text)
+                for x in range(len(batch_text))
             ]
             
             try:
-                _= self.client.upload_points(
+                _= self.client.upsert(
                             collection_name=collection_name,
                             points=batch_records)
             except Exception as e:
