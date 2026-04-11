@@ -19,3 +19,4 @@ class ResponseSignal(Enum):
 
     VECTOR_DB_INDEXING_ERROR = "An error occurred while indexing data into the vector database."
     VECTOR_DB_INDEXING_SUCCESS = "Data indexed into the vector database successfully."
+    VECTOR_DB_COLLECTION_INFO_SUCCESS = "Vector database collection information retrieved successfully."

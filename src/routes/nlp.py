@@ -76,3 +76,26 @@ async def index_project( request:Request,project_id:str, nlp_push_schema : NlpPu
             "indexed_chunks_count": inserted_chunks_count
         }
     )
+
+
+@router.get("index/info/{project_id}")
+async def get_project_index_info(request:Request, project_id:str):
+    
+    project_model = await ProjectModel.create_instance(db_client=request.app.mongodb)
+    project = await project_model.get_projct_or_create_one(project_id=project_id)
+
+    
+    nlp_controller = NlpController(
+        vector_db_client = request.app.vector_db_client,
+        llm_client= request.app.llm_client,
+        embed_client =  request.app.embed_client
+    )
+
+    collection_info = nlp_controller.get_collection_info(project=project)
+
+    return JSONResponse(
+        content={
+            "signal": ResponseSignal.VECTOR_DB_COLLECTION_INFO_SUCCESS.value,
+            "collection_info": collection_info
+        }
+    )
