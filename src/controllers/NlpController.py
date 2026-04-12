@@ -71,6 +71,6 @@ class NlpController(BaseController):
         if search_results is None:
             return False
 
-        return search_results.dict()
+        return search_results
 
     

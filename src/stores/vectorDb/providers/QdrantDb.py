@@ -3,6 +3,8 @@ from ..VectorDbInterface import VectorDbInterface
 from qdrant_client import QdrantClient, models
 import logging
 from typing import List
+from models.db_schemas import RetrievedDocument
+import json
 
 class QdrantDb(VectorDbInterface):
 
@@ -123,8 +125,27 @@ class QdrantDb(VectorDbInterface):
 
     
     def search_by_vector(self, collection_name: str, query: list, limit: int=5):
-        return self.client.query_points(
+        result =  self.client.query_points(
             collection_name=collection_name,
             query=query,
             limit=limit
         )
+
+       
+        if result is None:
+            return False
+        
+
+        return [
+        RetrievedDocument(
+            score=hit.score,
+            text=hit.payload.get("text", "") if hit.payload else ""
+        ).model_dump()          # ← Convert to dict here
+        for hit in result.points
+    ]
+    
+        # return self.client.query_points(
+        #     collection_name=collection_name,
+        #     query=query,
+        #     limit=limit
+        # )
