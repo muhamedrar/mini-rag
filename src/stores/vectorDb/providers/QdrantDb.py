@@ -135,12 +135,11 @@ class QdrantDb(VectorDbInterface):
         if result is None:
             return False
         
-
         return [
         RetrievedDocument(
             score=hit.score,
             text=hit.payload.get("text", "") if hit.payload else ""
-        ).model_dump()          # ← Convert to dict here
+        )      
         for hit in result.points
     ]
     
