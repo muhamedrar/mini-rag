@@ -1,7 +1,7 @@
 from fastapi import APIRouter ,status,Request
 from fastapi.responses import JSONResponse
 import logging
-from schemas.nlp_push_schema import NlpPushSchema
+from schemas.nlp_push_schema import NlpPushSchema,NlpSchemaSearch
 from models.ProjectModel import ProjectModel
 from models.ChunkModel import ChunkModel
 from controllers import NlpController
@@ -97,5 +97,35 @@ async def get_project_index_info(request:Request, project_id:str):
         content={
             "signal": ResponseSignal.VECTOR_DB_COLLECTION_INFO_SUCCESS.value,
             "collection_info": collection_info
+        }
+    )
+
+@router.post("index/search/{project_id}")
+async def search_project_index(request:Request, project_id:str, nlp_schema_search:NlpSchemaSearch):
+    
+    project_model = await ProjectModel.create_instance(db_client=request.app.mongodb)
+    project = await project_model.get_projct_or_create_one(project_id=project_id)
+
+    
+    nlp_controller = NlpController(
+        vector_db_client = request.app.vector_db_client,
+        llm_client= request.app.llm_client,
+        embed_client =  request.app.embed_client
+    )
+
+    results = nlp_controller.search_in_vector_db(project=project, query=nlp_schema_search.query, limit=nlp_schema_search.limit)
+
+    if results is False:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "signal": ResponseSignal.VECTOR_DB_SEARCH_ERROR.value
+            }
+        )
+    
+    return JSONResponse(
+        content={
+            "signal": ResponseSignal.VECTOR_DB_SEARCH_SUCCESS.value,
+            "results": results
         }
     )

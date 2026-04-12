@@ -53,5 +53,24 @@ class NlpController(BaseController):
         )
 
         return True
+    
+    def search_in_vector_db(self, project: Project, query: str, limit: int = 5):
+        collection_name = self.create_collection_name(project_id=project.project_id)
+
+        query_vector = self.embed_client.embed_text(text=query, document_type=DocumentTypeEnums.QUERY.value)
+
+        if query_vector is None:
+           return False
+
+        search_results = self.vector_db_client.search_by_vector(
+            collection_name=collection_name,
+            query=query_vector,
+            limit=limit
+        )
+
+        if search_results is None:
+            return False
+
+        return search_results.dict()
 
     
