@@ -110,7 +110,8 @@ async def search_project_index(request:Request, project_id:str, nlp_schema_searc
     nlp_controller = NlpController(
         vector_db_client = request.app.vector_db_client,
         llm_client= request.app.llm_client,
-        embed_client =  request.app.embed_client
+        embed_client =  request.app.embed_client,
+        template_parser = request.app.template_parser
     )
 
     results = nlp_controller.search_in_vector_db(project=project, query=nlp_schema_search.query, limit=nlp_schema_search.limit)

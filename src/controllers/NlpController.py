@@ -6,12 +6,13 @@ import json
 
 
 class NlpController(BaseController):
-    def __init__(self, vector_db_client, llm_client, embed_client):
+    def __init__(self, vector_db_client, llm_client, embed_client,template_parser = None):
         super().__init__()
 
         self.vector_db_client = vector_db_client
         self.llm_client = llm_client
         self.embed_client = embed_client
+        self.template_parser = template_parser
 
     def create_collection_name(self,project_id: str):
         collection_name = f"project_{project_id}"
@@ -74,3 +75,26 @@ class NlpController(BaseController):
         return search_results
 
     
+    def answer_rag_qestion(self, project:Project, query:str, limit: int = 10):
+
+        retrived_docs = self.search_in_vector_db(
+            project=project,
+            query=query,
+            limit=limit
+        )
+
+        # construct llm prompt
+
+        system_prompt =  self.template_parser.get("rag","system_prompt")
+
+        docs_prompt = [
+            self.template_parser.get("rag","documents_prompt",{
+                "doc_no" : idx+1,
+                "chunk_text": doc.text
+            })
+            for idx, doc in enumerate(retrived_docs)
+        ]
+
+        footer_prompt =  self.template_parser.get("rag","footer_prompt")
+
+       
