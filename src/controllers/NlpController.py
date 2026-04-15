@@ -94,7 +94,25 @@ class NlpController(BaseController):
             })
             for idx, doc in enumerate(retrived_docs)
         ]
+        docs_text = "\n\n".join(docs_prompt)
 
         footer_prompt =  self.template_parser.get("rag","footer_prompt")
 
-       
+        chat_history = [
+           self.llm_client.construct_prompt(
+               prompt = system_prompt,
+               role = self.llm_client.enums.ROLE_SYSTEM.value
+           )
+        ]
+
+        full_prompt = f"{docs_text}\n\n{footer_prompt}"
+
+        answer = self.llm_client.generate_text(
+            prompt = full_prompt,
+            chat_history = chat_history,
+            
+            
+        )
+
+
+        return answer, full_prompt, chat_history

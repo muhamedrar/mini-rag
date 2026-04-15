@@ -5,7 +5,7 @@ from helpers.config import get_settings
 from contextlib import asynccontextmanager
 from stores.llms.LLmFactory import LLmFactory
 from stores.vectorDb.VectorDbFactory import VectorDbFactory
-from stores.llms.templates import TemplateParser
+from stores.llms.templates.template_parser import TemplateParser
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

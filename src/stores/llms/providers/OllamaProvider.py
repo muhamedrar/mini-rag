@@ -21,6 +21,8 @@ class OllamaProvider(LLMInterface):
         self.embedding_model_id = None
         self.embedding_model_size = None
 
+       
+
         # key logic
         if api_key and api_url:
             # cloud (OpenAI-compatible endpoint)

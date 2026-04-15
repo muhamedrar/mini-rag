@@ -130,3 +130,45 @@ async def search_project_index(request:Request, project_id:str, nlp_schema_searc
             "results": [result.dict() for result in results]
         }
     )
+
+
+
+@router.post("index/answer/{project_id}")
+async def asnwer_rag(request:Request, project_id:str, nlp_schema_search:NlpSchemaSearch):
+    
+    project_model = await ProjectModel.create_instance(db_client=request.app.mongodb)
+    project = await project_model.get_projct_or_create_one(project_id=project_id)
+
+    
+    nlp_controller = NlpController(
+        vector_db_client = request.app.vector_db_client,
+        llm_client= request.app.llm_client,
+        embed_client =  request.app.embed_client,
+        template_parser = request.app.template_parser
+    )
+
+
+    answer, full_prompt, chat_history = nlp_controller.answer_rag_qestion(
+        project=project,
+        query=nlp_schema_search.query,
+        limit=nlp_schema_search.limit
+
+    )
+
+    if not answer:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "signal": ResponseSignal.RAG_ANSWER_ERROR.value
+            }
+        )
+    
+    return  JSONResponse(
+            
+            content={
+                "signal": ResponseSignal.RAG_ANSWER_SUCCESS.value,
+                "answer": answer,
+                "full_prompt": full_prompt,
+                "chat_history": chat_history
+            }
+        )

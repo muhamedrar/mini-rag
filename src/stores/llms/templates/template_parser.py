@@ -53,4 +53,5 @@ class TemplateParser:
             return None
         
         key_attrib = getattr(module,key)
+        
         return key_attrib.substitute(vars)

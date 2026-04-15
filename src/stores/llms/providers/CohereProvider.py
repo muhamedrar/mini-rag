@@ -21,6 +21,8 @@ class CohereProvider(LLMInterface):
         self.generation_model_id = None
         self.embedding_model_id = None
         self.embedding_model_size = None
+        
+        self.enums = CohereEnums
 
         self.client = cohere.Client(api_key= self.api_key)
 
@@ -48,12 +50,13 @@ class CohereProvider(LLMInterface):
             return None
         
         response = self.client.chat(
+            message=prompt,
             model=self.generation_model_id,
             temperature=temperature ,
             max_tokens=max_output_tokens ,
             chat_history=chat_history
             )
-        if not response or not response.choices or len(response.choices) == 0 or not response.choices[0].message:
+        if not response or not response.text:
             self.logger.error("No response returned from Cohere")
             return None
         

@@ -1,7 +1,7 @@
 from string import Template
 
 ### RAG Prompts (بالعربية)
-system_prompt = "\n".join([
+system_prompt = Template("\n".join([
 "أجب بدقة بناءً على السياق المسترجع فقط.",
 "لا تستخدم أي معرفة خارجية أو افتراضات.",
 "إذا كانت المعلومات غير موجودة في السياق، رد بالنص التالي بالضبط: ليس لدي معلومات كافية للإجابة على هذا السؤال بناءً على الوثائق المتاحة.",
@@ -9,7 +9,7 @@ system_prompt = "\n".join([
 "كن دقيقًا وحقيقيًا وموجزًا.",
 "استخدم نبرة احترافية وتعليمية.",
 "عند الاقتضاء، اقتبس أو أشر مباشرة إلى السياق."
-])
+]))
 
 ## Prompt template for formatting retrieved documents
 documents_prompt = Template(
@@ -20,7 +20,7 @@ documents_prompt = Template(
 )
 
 ## footer
-footer_prompt = "\n".join([
+footer_prompt = Template("\n".join([
 "أجب على السؤال بناءً على الوثائق المسترجعة أعلاه.",
 "##الإجابة:"
-])
+]))
