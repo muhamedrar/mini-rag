@@ -24,5 +24,8 @@ documents_prompt = Template(
 
 footer_prompt = Template("\n".join([
     "Answer the question based on the above retrieved documents.",
+    "##Qestion:",
+    "$query",
+    "",
     "##Answer:"
 ]))

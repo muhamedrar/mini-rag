@@ -97,7 +97,9 @@ class NlpController(BaseController):
         ]
         docs_text = "\n\n".join(docs_prompt)
 
-        footer_prompt =  self.template_parser.get("rag","footer_prompt")
+        footer_prompt =  self.template_parser.get("rag","footer_prompt",{
+            "query":query
+        })
 
         chat_history = [
            self.llm_client.construct_prompt(
