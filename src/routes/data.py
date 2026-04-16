@@ -128,7 +128,7 @@ async def process_file(request: Request, project_id: str, process_request_schema
         )
     
     if do_reset == 1:
-            await chunk_model.delete_chunks_by_projec_id(project.id)
+            deleted_count = await chunk_model.delete_chunks_by_projec_id(project.id)
     
     process_controller = ProcessController(project_id=project_id)
     no_of_chunks = 0
@@ -177,7 +177,8 @@ async def process_file(request: Request, project_id: str, process_request_schema
             "signal" : ResponseSignal.FILE_PROCESSING_SUCCESS.value,
             "file_id" : file_id,
             "inserted_chunks": no_of_chunks,
-            "number_of_processed_files": no_of_files
+            "number_of_processed_files": no_of_files,
+            "deleted_old_count":deleted_count
         }
     )
 
