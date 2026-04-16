@@ -9,6 +9,7 @@ from models.enums.ResponseEnums import ResponseSignal
 from stores.vectorDb.VectorDbFactory import VectorDbFactory
 from helpers.config import get_settings
 from bson import ObjectId
+
 logger = logging.getLogger('uvicorn.error')
 
 
@@ -44,11 +45,11 @@ async def index_project( request:Request,project_id:str, nlp_push_schema : NlpPu
     page_number = 1
     inserted_chunks_count = 0
     idx = 0
-
-
+    
     while True:
         page_chunks = await chunk_model.get_project_chunks(project_id=project.id, page=page_number)
-        print(f"Fetched {len(page_chunks)} chunks for page {page_number}.")
+        do_reset = nlp_push_schema.do_reset if page_number == 1 else 0
+
         if len(page_chunks):
             logger.info(f"Fetched {len(page_chunks)} chunks for page {page_number}.")
             page_number += 1
@@ -59,9 +60,9 @@ async def index_project( request:Request,project_id:str, nlp_push_schema : NlpPu
 
         chunks_ids = list(range(idx, idx + len(page_chunks)))
         idx += len(page_chunks)
-
-        is_inserted = nlp_controller.index_into_vector_db(project=project, data_chunks=page_chunks, do_reset=nlp_push_schema.do_reset,chunk_ids=chunks_ids)
-
+        
+        is_inserted = nlp_controller.index_into_vector_db(project=project, data_chunks=page_chunks, do_reset=do_reset,chunk_ids=chunks_ids)
+        
         if not is_inserted:
             return JSONResponse(
                 status_code=status.http_500_INTERNAL_SERVER_ERROR,
