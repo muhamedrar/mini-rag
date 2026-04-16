@@ -37,7 +37,8 @@ async def index_project( request:Request,project_id:str, nlp_push_schema : NlpPu
     nlp_controller = NlpController(
         vector_db_client = request.app.vector_db_client,
         llm_client= request.app.llm_client,
-        embed_client =  request.app.embed_client
+        embed_client =  request.app.embed_client,
+        template_parser= request.app.template_parser
     )
 
     page_number = 1
@@ -88,12 +89,14 @@ async def get_project_index_info(request:Request, project_id:str):
     nlp_controller = NlpController(
         vector_db_client = request.app.vector_db_client,
         llm_client= request.app.llm_client,
-        embed_client =  request.app.embed_client
+        embed_client =  request.app.embed_client,
+        template_parser=request.app.template_parser
     )
     try:
         collection_info = nlp_controller.get_collection_info(project=project)
 
         return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
             content={
                 "signal": ResponseSignal.VECTOR_DB_COLLECTION_INFO_SUCCESS.value,
                 "collection_info": collection_info
