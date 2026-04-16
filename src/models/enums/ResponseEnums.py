@@ -22,6 +22,6 @@ class ResponseSignal(Enum):
     VECTOR_DB_COLLECTION_INFO_SUCCESS = "Vector database collection information retrieved successfully."
     VECTOR_DB_SEARCH_ERROR = "An error occurred while searching in the vector database."
     VECTOR_DB_SEARCH_SUCCESS = "Search in the vector database completed successfully."
-
+    VECTOR_DB_COLLECTION_NOT_FOUND = "no collection for the provided project ID"
     RAG_ANSWER_ERROR= "rag answer error"
     RAG_ANSWER_SUCCESS = "rag answer sucess"

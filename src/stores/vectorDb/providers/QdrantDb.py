@@ -39,7 +39,10 @@ class QdrantDb(VectorDbInterface):
 
    
     def get_collection_info(self, collection_name: str) -> dict:
-        return self.client.get_collection(collection_name)
+        try:
+            return self.client.get_collection(collection_name)
+        except Exception :
+            return None
 
     
     def delete_collection(self, collection_name: str):

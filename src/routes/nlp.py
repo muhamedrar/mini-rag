@@ -90,15 +90,22 @@ async def get_project_index_info(request:Request, project_id:str):
         llm_client= request.app.llm_client,
         embed_client =  request.app.embed_client
     )
+    try:
+        collection_info = nlp_controller.get_collection_info(project=project)
 
-    collection_info = nlp_controller.get_collection_info(project=project)
-
-    return JSONResponse(
-        content={
-            "signal": ResponseSignal.VECTOR_DB_COLLECTION_INFO_SUCCESS.value,
-            "collection_info": collection_info
-        }
-    )
+        return JSONResponse(
+            content={
+                "signal": ResponseSignal.VECTOR_DB_COLLECTION_INFO_SUCCESS.value,
+                "collection_info": collection_info
+            }
+        )
+    except Exception:
+        return JSONResponse(
+                    content={
+                        "signal": ResponseSignal.VECTOR_DB_COLLECTION_NOT_FOUND.value
+                            }
+                        )
+        
 
 @router.post("index/search/{project_id}")
 async def search_project_index(request:Request, project_id:str, nlp_schema_search:NlpSchemaSearch):
@@ -167,7 +174,7 @@ async def asnwer_rag(request:Request, project_id:str, nlp_schema_search:NlpSchem
             
             content={
                 "signal": ResponseSignal.RAG_ANSWER_SUCCESS.value,
-                "answer": answer,
+                "answer": answer.strip(),
                 "full_prompt": full_prompt,
                 "chat_history": chat_history
             }
