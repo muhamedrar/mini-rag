@@ -1,5 +1,5 @@
 from ..llms.providers import CohereProvider
-from ..llms.providers import OpenAiProvider ,OllamaProvider
+from ..llms.providers import OpenAiProvider 
 from .LLMEnums import LLMType
 
 
@@ -25,14 +25,7 @@ class LLmFactory:
                 default_temperature=self.config.DEFAULT_TEMPERATURE
             )
         
-        if provider_name == LLMType.OLLAMA.value:
-            return OllamaProvider(
-                api_key=self.config.OLLAMA_API_KEY,
-                api_url=self.config.oLLAMA_API_URL,
-                default_input_max_characters=self.config.INPUT_DEFAULT_MAX_CHARACTERS,
-                default_output_max_tokens=self.config.DEFAULT_OUTPUT_MAX_TOKENS,
-                default_temperature=self.config.DEFAULT_TEMPERATURE
-            )
+
         raise ValueError(f"Unsupported provider: {provider_name}")
 
     
