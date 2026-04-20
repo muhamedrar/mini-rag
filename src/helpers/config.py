@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     EMBEDING_BACKEND : str
 
     OPENAI_API_KEY: Optional[str] = None
-    OPENAI_URI: Optional[str] = None
+    OPENAI_API_URL: Optional[str] = None
     COHERE_API_KEY: Optional[str] = None
     GENERATION_MODEL_ID: Optional[str] = None
     EMBEDDING_MODEL_ID: Optional[str] = None

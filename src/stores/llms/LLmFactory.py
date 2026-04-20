@@ -11,9 +11,9 @@ class LLmFactory:
         if provider_name == LLMType.OPENAI.value:
             return OpenAiProvider(
                 api_key=self.config.OPENAI_API_KEY,
-                api_url=self.config.OPENAI_URI,
+                api_url=self.config.OPENAI_API_URL,
                 default_input_max_characters=self.config.INPUT_DEFAULT_MAX_CHARACTERS,
-                default_output_max_tokens=self.config.DEFAULT_OUTPUT_MAX_TOKENS,
+                default_output_max_tokens=self.config.INPUT_DEFAULT_MAX_CHARACTERS,
                 default_temperature=self.config.DEFAULT_TEMPERATURE
 
             )

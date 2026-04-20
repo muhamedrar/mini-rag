@@ -24,7 +24,7 @@ class OpenAiProvider(LLMInterface):
         self.enums = OpenAiEnums
 
 
-        self.client = OpenAI(api_key=self.api_key, api_url=self.api_url)
+        self.client = OpenAI(api_key=self.api_key, base_url=self.api_url)
 
         self.logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ class OpenAiProvider(LLMInterface):
             return None
         
 
-        return response.choices[0].message['content']
+        return response.choices[0].message.content
 
 
     def embed_text(self, text: str,document_type: str = None) :
