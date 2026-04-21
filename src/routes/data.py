@@ -30,7 +30,7 @@ async def upload_file(
     app_settings: Settings = Depends(get_settings)
 ):
     
-    project_model = await ProjectModel.create_instance(db_client=request.app.mongodb)
+    project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
     project = await project_model.get_projct_or_create_one(project_id=project_id)
 
     is_valid, signal = data_controller.validate_uploaded_file(file)
@@ -62,7 +62,7 @@ async def upload_file(
     
     # storing asset into the database
 
-    asset_model =await AssetModel.create_instance(db_client=request.app.mongodb)
+    asset_model =await AssetModel.create_instance(db_client=request.app.db_client)
     asset_resource = Asset(
         asset_project_id=project.id,
         asset_type=AssetTypesEnums.FILE.value,
@@ -93,10 +93,10 @@ async def process_file(request: Request, project_id: str, process_request_schema
     overlap_size = process_request_schema.ovelap_size
     do_reset = process_request_schema.do_reset
     
-    chunk_model = await ChunkModel.create_instance(db_client=request.app.mongodb)
-    project_model = await ProjectModel.create_instance(db_client=request.app.mongodb)
+    chunk_model = await ChunkModel.create_instance(db_client=request.app.db_client)
+    project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
     project = await project_model.get_projct_or_create_one(project_id=project_id)
-    asset_model =await AssetModel.create_instance(db_client=request.app.mongodb)
+    asset_model =await AssetModel.create_instance(db_client=request.app.db_client)
 
     project_files_ids = {}
     if process_request_schema.file_id:
