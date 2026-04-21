@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from helpers.config import get_settings, Settings
 from controllers import DataController, ProcessController
 from schemas import ProcessRequestSchema
-from models.db_schemas import DataChunk,Asset
+from models.db_schemas.minirag.schemas import DataChunk,Asset
 from models.ProjectModel import ProjectModel
 from models.ChunkModel import ChunkModel
 from models.AssetModel import AssetModel
@@ -25,7 +25,7 @@ data_controller = DataController()
 @router.post('/upload/{project_id}')
 async def upload_file(
     request: Request,
-    project_id: str,
+    project_id: int,
     file: UploadFile,
     app_settings: Settings = Depends(get_settings)
 ):
@@ -87,7 +87,7 @@ async def upload_file(
 
 
 @router.post('/process/{project_id}')
-async def process_file(request: Request, project_id: str, process_request_schema: ProcessRequestSchema):
+async def process_file(request: Request, project_id: int, process_request_schema: ProcessRequestSchema):
     
     chank_size = process_request_schema.chunk_size
     overlap_size = process_request_schema.ovelap_size

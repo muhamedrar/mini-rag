@@ -20,7 +20,7 @@ router = APIRouter(
 
 
 @router.post("index/push/{project_id}")
-async def index_project( request:Request,project_id:str, nlp_push_schema : NlpPushSchema):
+async def index_project( request:Request,project_id: int, nlp_push_schema : NlpPushSchema):
 
     project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
     project = await project_model.get_projct_or_create_one(project_id=project_id)
@@ -81,7 +81,7 @@ async def index_project( request:Request,project_id:str, nlp_push_schema : NlpPu
 
 
 @router.get("index/info/{project_id}")
-async def get_project_index_info(request:Request, project_id:str):
+async def get_project_index_info(request:Request, project_id: int):
     
     project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
     project = await project_model.get_projct_or_create_one(project_id=project_id)
@@ -112,7 +112,7 @@ async def get_project_index_info(request:Request, project_id:str):
         
 
 @router.post("index/search/{project_id}")
-async def search_project_index(request:Request, project_id:str, nlp_schema_search:NlpSchemaSearch):
+async def search_project_index(request:Request, project_id: int, nlp_schema_search:NlpSchemaSearch):
     
     project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
     project = await project_model.get_projct_or_create_one(project_id=project_id)
@@ -145,7 +145,7 @@ async def search_project_index(request:Request, project_id:str, nlp_schema_searc
 
 
 @router.post("index/answer/{project_id}")
-async def asnwer_rag(request:Request, project_id:str, nlp_schema_search:NlpSchemaSearch):
+async def asnwer_rag(request:Request, project_id: int, nlp_schema_search:NlpSchemaSearch):
     
     project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
     project = await project_model.get_projct_or_create_one(project_id=project_id)
