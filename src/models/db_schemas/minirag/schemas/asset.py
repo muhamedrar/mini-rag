@@ -1,4 +1,4 @@
-from schemas.minirag_base import sqlalchemyBase
+from .minirag_base import sqlalchemyBase
 from sqlalchemy import Column, Integer,ForeignKey, DateTime,func ,String
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
@@ -18,7 +18,8 @@ class Asset(sqlalchemyBase):
     
     asset_project_id = Column(Integer,ForeignKey("projects.id"), nullable=False)
 
-    project = relationship("Project", backref="assets")
+    project = relationship("Project", back_populates="assets")
+    chunks = relationship("DataChunk", back_populates="asset")
 
     created_at = Column(DateTime(timezone=True),server_default=func.now(),nullable=False )
     upated_at = Column(DateTime(timezone=True),onupdate=func.now(), nullable=True)

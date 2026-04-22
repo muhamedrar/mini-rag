@@ -2,4 +2,4 @@
 # from .project import Project
 # from .asset import Asset
 
-from schemas import Asset, DataChunk, Project, RetrievedDocument
+from .minirag.schemas import Asset, DataChunk, Project, RetrievedDocument

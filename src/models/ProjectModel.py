@@ -26,24 +26,27 @@ class ProjectModel(BaseDataModel):
         async with self.db_client() as session:
             async with session.begin():
                 session.add(project)
+                await session.flush()
+                await session.refresh(project)
             await session.commit()
-            await session.refresh(project)
         return project
     
 
     async def get_projct_or_create_one(self, project_id: str):
         async with self.db_client() as session:
-                    async with session.begin():
-                        query = select(Project).where(Project.id == project_id)
-                        project = query.scalar_one_or_none()
-                        if project is None:
-                            project_record = Project(
-                                   id= project_id
-                                )
-                            project = self.create_project(project= project_record)
-                            return project
-                        else:
-                            return project
+            async with session.begin():
+
+                result = await session.execute(
+                    select(Project).where(Project.id == project_id)
+                )
+                project = result.scalar_one_or_none()
+
+                if project is None:
+                    project = Project(id=project_id)
+                    session.add(project)
+                    await session.flush()
+
+        return project
                               
         
     
@@ -51,15 +54,15 @@ class ProjectModel(BaseDataModel):
 
         async with self.db_client() as session:
             async with session.begin():
-                total_records = await session.execute(select(
-                      func.count(Project.id)
-                 )).scalar_one()
+                result = await session.execute(select(func.count(Project.id)))
+                total_records = result.scalar_one()
                 total_pages = total_records// page_size
                 if total_records % page_size != 0:
                     total_pages += 1
                 query = select(Project).offset((page-1)*page_size).limit(page_size)
-                projects = await session.execute(query).scalars().all()
-                return projects, total_pages
+                result = await session.execute(query)
+                projects = result.scalars().all()
+        return projects, total_pages
         
     
 

@@ -47,30 +47,36 @@ async def index_project( request:Request,project_id: int, nlp_push_schema : NlpP
     idx = 0
     
     while True:
-        page_chunks = await chunk_model.get_project_chunks(project_id=project.id, page=page_number)
-        do_reset = nlp_push_schema.do_reset if page_number == 1 else 0
+        page_chunks = await chunk_model.get_project_chunks(
+            project_id=project.id, page=page_number
+        )
 
-        if len(page_chunks):
-            logger.info(f"Fetched {len(page_chunks)} chunks for page {page_number}.")
-            page_number += 1
         if not page_chunks:
-            
-            logger.info(f"No more chunks to fetch for page {page_number}. Ending pagination.")
+            logger.info(f"No more chunks. Ending pagination.")
             break
+
+        logger.info(f"Fetched {len(page_chunks)} chunks for page {page_number}.")
+
+        do_reset = nlp_push_schema.do_reset if page_number == 1 else 0
 
         chunks_ids = list(range(idx, idx + len(page_chunks)))
         idx += len(page_chunks)
-        
-        is_inserted = nlp_controller.index_into_vector_db(project=project, data_chunks=page_chunks, do_reset=do_reset,chunk_ids=chunks_ids)
-        
+
+        is_inserted = nlp_controller.index_into_vector_db(
+            project=project,
+            data_chunks=page_chunks,
+            do_reset=do_reset,
+            chunk_ids=chunks_ids
+        )
+
         if not is_inserted:
             return JSONResponse(
-                status_code=status.http_500_INTERNAL_SERVER_ERROR,
-                content={
-                    "signal": ResponseSignal.VECTOR_DB_INDEXING_ERROR.value
-                }
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content={"signal": ResponseSignal.VECTOR_DB_INDEXING_ERROR.value}
             )
+
         inserted_chunks_count += len(page_chunks)
+        page_number += 1
         
     return JSONResponse(
         content={

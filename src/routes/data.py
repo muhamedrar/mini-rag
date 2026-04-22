@@ -127,6 +127,8 @@ async def process_file(request: Request, project_id: int, process_request_schema
             }
         )
     
+
+    deleted_count = 0
     if do_reset == 1:
             deleted_count = await chunk_model.delete_chunks_by_projec_id(project.id)
     
@@ -155,7 +157,7 @@ async def process_file(request: Request, project_id: int, process_request_schema
         file_chunk_records = [
             DataChunk(
                 chunk_text=chunk.page_content,
-                chunck_metadata=chunk.metadata,
+                chunk_metadata =chunk.metadata,
                 chunk_order=i+1,
                 chunk_project_id=project.id,
                 chunk_assit_id=asset_id

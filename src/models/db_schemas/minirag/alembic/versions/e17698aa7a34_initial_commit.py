@@ -1,8 +1,8 @@
-"""init commit2
+"""initial commit
 
-Revision ID: 122bd5015e54
+Revision ID: e17698aa7a34
 Revises: 
-Create Date: 2026-04-21 23:06:49.219499
+Create Date: 2026-04-22 19:19:12.667265
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '122bd5015e54'
+revision: str = 'e17698aa7a34'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -49,7 +49,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('chunk_uuid', sa.UUID(), nullable=False),
     sa.Column('chunk_text', sa.String(), nullable=False),
-    sa.Column('chunk_metadata', sa.Integer(), nullable=False),
+    sa.Column('chunk_metadata', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('chunk_order', sa.Integer(), nullable=False),
     sa.Column('chunk_project_id', sa.Integer(), nullable=False),
     sa.Column('chunk_assit_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),

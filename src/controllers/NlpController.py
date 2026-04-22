@@ -20,20 +20,20 @@ class NlpController(BaseController):
         return collection_name.strip()
     
     def reset_vector_db_collection(self, project: Project):
-        collection_name = self.create_collection_name(project_id=project.project_id)
+        collection_name = self.create_collection_name(project_id=project.id)
         return self.vector_db_client.delete_collection(collection_name=collection_name)
     
     def get_collection_info(self, project: Project):
-        collection_name = self.create_collection_name(project_id=project.project_id)
+        collection_name = self.create_collection_name(project_id=project.id)
         info = self.vector_db_client.get_collection_info(collection_name=collection_name)
         return info.dict()
     
 
     def index_into_vector_db(self, project: Project, chunk_ids:List[int] , data_chunks: list[DataChunk], do_reset: bool = False):
-        collection_name = self.create_collection_name(project_id=project.project_id)
+        collection_name = self.create_collection_name(project_id=project.id)
 
         texts = [chunk.chunk_text for chunk in data_chunks]
-        metadatas = [chunk.chunck_metadata for chunk in data_chunks]
+        metadatas = [chunk.chunk_metadata for chunk in data_chunks]
         vectors = [
             self.embed_client.embed_text(text=text, document_type=DocumentTypeEnums.DOCUMENT.value)
             for text in texts
@@ -57,7 +57,7 @@ class NlpController(BaseController):
         return True
     
     def search_in_vector_db(self, project: Project, query: str, limit: int = 5):
-        collection_name = self.create_collection_name(project_id=project.project_id)
+        collection_name = self.create_collection_name(project_id=project.id)
 
         query_vector = self.embed_client.embed_text(text=query, document_type=DocumentTypeEnums.QUERY.value)
 
