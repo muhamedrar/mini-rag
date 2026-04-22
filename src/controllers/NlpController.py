@@ -91,7 +91,7 @@ class NlpController(BaseController):
         docs_prompt = [
             self.template_parser.get("rag","documents_prompt",{
                 "doc_no" : idx+1,
-                "chunk_text": doc.text
+                "chunk_text":self.llm_client.process_text(doc.text)
             })
             for idx, doc in enumerate(retrived_docs)
         ]
