@@ -27,7 +27,7 @@ class ProjectModel(BaseDataModel):
             async with session.begin():
                 session.add(project)
             await session.commit()
-            await session.refresh()
+            await session.refresh(project)
         return project
     
 
