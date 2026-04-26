@@ -67,11 +67,12 @@ class PGVectorDb(VectorDbInterface):
         async with self.db_client() as session:
                     table_info = await session.execute(
                         sql_text("""
-                            SELECT schemaname, tablename , tableowner, hasindexes
+                            SELECT schemansessioname, tablename , tableowner, hasindexes
                             FROM pg_tables 
                             WHERE tablename = :collection_name
                         """),
-                        {'collection_name':collection_name})
+                        {'collection_name':collection_name}
+                        )
                     
                     count = await session.execute(
                         sql_text(f"""
@@ -89,4 +90,46 @@ class PGVectorDb(VectorDbInterface):
                         "table_info": dict(table_data),
                         "table_count": count
                     }
+        
+
+
+    async def delete_collection(self, collection_name: str):
+        async with self.db_client as session:
+             async with session.begin():
+                self.logger.info(f"Deleting collection : {collection_name}")
+                await session.execute(
+                        sql_text("""
+                            DROP table if EXISTS :collection_name
+                        """),
+                        {'collection_name':collection_name}
+                        )
+                await session.commit()
+        return True
     
+    async def create_collection(self, collection_name: str, embedding_dimension: int, do_reset: bool = False):
+        if do_reset == 1:
+            _ = await self.delete_collection(collection_name=collection_name)
+        
+        is_collection_exist = await self.is_collection_exist(collection_name=collection_name)
+
+        if not is_collection_exist:
+            self.logger.info(f"Creating collection :{collection_name}")
+
+            async with self.db_client as session:
+                async with session.begin():
+                    create_table = sql_text(f"""
+                                            CREATE TABLE {collection_name} (
+                                                {pgvectorTableSchema.ID.value} bigserial PRIMARY KEY,
+                                                {pgvectorTableSchema.TEXT.value} text,
+                                                {pgvectorTableSchema.VECTOR.value} vector({embedding_dimension}),
+                                                {pgvectorTableSchema.CHUNK_ID.value} integer,
+                                                {pgvectorTableSchema.METADATA.value} jsonb DEFAULT '{{}}',
+                                                FOREIGN KEY (chunk_id) REFERENCES chunks(id) ON DELETE CASCADE
+                                            )
+                                            """)
+                    await session.execute(create_table)
+                    await session.commit()
+            return True
+        else:
+            self.logger.info(f"Collection {collection_name} already exists.")
+            return False
