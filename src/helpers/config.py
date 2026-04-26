@@ -1,6 +1,9 @@
 
 from pydantic_settings import BaseSettings
 from typing import Optional
+from typing import List
+
+
 class Settings(BaseSettings):
     
     APP_NAME: str
@@ -29,6 +32,7 @@ class Settings(BaseSettings):
     GENERATION_DEFAULT_MAX_TOKEN: Optional[int] = None
     DEFAULT_TEMPERATURE: Optional[float] = None
 
+    VECTOR_DB_BACKEND_LITERALS: Optional[List[str]] = None
     VECTOR_DISTANCE_METHOD: Optional[str] = None
     VECTOR_DB_BACKEND: str
     VECTOR_DB_PATH: str 

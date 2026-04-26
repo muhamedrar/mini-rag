@@ -17,3 +17,6 @@ alembic==1.18.4
 # if you are windows use psycopg2==2.9.12 instead of binary version
 psycopg2-binary==2.9.12
 
+pgvector==0.4.2
+nltk==3.9.4
+
