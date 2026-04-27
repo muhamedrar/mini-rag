@@ -8,8 +8,8 @@ import json
 
 class QdrantDb(VectorDbInterface):
 
-    def __init__(self,db_path:str,distance_method:str):
-        self.db_path = db_path
+    def __init__(self,db_client:str,distance_method:str):
+        self.db_client = db_client
         self.distance_method = None
         self.client = None
 
@@ -18,42 +18,43 @@ class QdrantDb(VectorDbInterface):
         elif distance_method == DistanceMethod.DOT_PRODUCT.value:
             self.distance_method = models.Distance.DOT
 
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger('uvicorn')
 
 
-    def connect(self):
-        self.client = QdrantClient(path=self.db_path)
-        self.logger.info(f"Connected to Qdrant database at {self.db_path}")
+    async def connect(self):
+        self.client = QdrantClient(path=self.db_client)
+        self.logger.info(f"Connected to Qdrant database at {self.db_client}")
 
-    def disconnect(self):
+    async def disconnect(self):
         self.client = None
         self.logger.info("Disconnected from Qdrant database")
 
-    def is_collection_exist(self,collection_name:str)->bool:
+    async def is_collection_exist(self,collection_name:str)->bool:
         return self.client.collection_exists(collection_name)
     
      
-    def list_all_collections(self) -> List:
+    async def list_all_collections(self) -> List:
         return self.client.get_collections()
 
 
    
-    def get_collection_info(self, collection_name: str) -> dict:
+    async def get_collection_info(self, collection_name: str) -> dict:
         try:
             return self.client.get_collection(collection_name)
         except Exception :
             return None
 
     
-    def delete_collection(self, collection_name: str):
+    async def delete_collection(self, collection_name: str):
         if self.is_collection_exist(collection_name=collection_name):
             return self.client.delete_collection(collection_name)
 
     
-    def create_collection(self, collection_name: str, embedding_dimension: int, do_reset: bool = False):
+    async def create_collection(self, collection_name: str, embedding_dimension: int, do_reset: bool = False):
         if do_reset:
             _=self.delete_collection(collection_name)
         if not self.is_collection_exist(collection_name):
+            self.logger.info(f"Creating new Qdrant collection: {collection_name} ")
             _=self.client.create_collection(
                 collection_name=collection_name,
                 vectors_config=models.VectorParams(size=embedding_dimension, distance=self.distance_method)
@@ -64,7 +65,7 @@ class QdrantDb(VectorDbInterface):
     
 
     
-    def insert_one(self, collection_name: str, text: str, vector: List, metadata: dict=None, record_id: str=None):
+    async def insert_one(self, collection_name: str, text: str, vector: List, metadata: dict=None, record_id: str=None):
         if not self.is_collection_exist(collection_name):
             self.logger.error(f"could not insert record to collection {collection_name} because it does not exist")
             return False
@@ -90,7 +91,7 @@ class QdrantDb(VectorDbInterface):
 
 
     
-    def insert_many(self, collection_name: str, text: List, vector: List, record_ids: List,  metadata: List=None, batch_size: int=50):
+    async def insert_many(self, collection_name: str, text: List, vector: List, record_ids: List,  metadata: List=None, batch_size: int=50):
         
         if metadata is None:
             metadata = [None] * len(text)
@@ -127,7 +128,7 @@ class QdrantDb(VectorDbInterface):
            
 
     
-    def search_by_vector(self, collection_name: str, query: list, limit: int=5):
+    async def search_by_vector(self, collection_name: str, query: list, limit: int=5):
         result =  self.client.query_points(
             collection_name=collection_name,
             query=query,
@@ -146,8 +147,3 @@ class QdrantDb(VectorDbInterface):
         for hit in result.points
     ]
     
-        # return self.client.query_points(
-        #     collection_name=collection_name,
-        #     query=query,
-        #     limit=limit
-        # )
