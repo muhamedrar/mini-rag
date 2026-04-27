@@ -12,6 +12,9 @@ import aiofiles
 import os
 from models import ResponseSignal
 import logging
+from controllers.NlpController import NlpController
+
+
 
 logger = logging.getLogger('uvicorn.error')
 
@@ -98,6 +101,13 @@ async def process_file(request: Request, project_id: int, process_request_schema
     project = await project_model.get_projct_or_create_one(project_id=project_id)
     asset_model =await AssetModel.create_instance(db_client=request.app.db_client)
 
+    nlp_controller = NlpController(
+        vector_db_client=request.app.vector_db_client,
+        llm_client=request.app.llm_client,
+        embed_client=request.app.embed_client,
+        template_parser=request.app.template_parser
+    )
+
     project_files_ids = {}
     if process_request_schema.file_id:
         asset_record = await asset_model.get_asset_record(asset_project_id=project.id, asset_name=process_request_schema.file_id)
@@ -130,6 +140,8 @@ async def process_file(request: Request, project_id: int, process_request_schema
 
     deleted_count = 0
     if do_reset == 1:
+            collection_name = nlp_controller.create_collection_name(project_id=project.id)
+            await nlp_controller.vector_db_client.delete_collection(collection_name=collection_name)
             deleted_count = await chunk_model.delete_chunks_by_projec_id(project.id)
     
     process_controller = ProcessController(project_id=project_id)

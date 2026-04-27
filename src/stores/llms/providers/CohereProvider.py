@@ -90,7 +90,7 @@ class CohereProvider(LLMInterface):
             self.logger.error("No embedding returned from Cohere")
             return None
         
-        return response.embeddings.float_
+        return [embedding for embedding in response.embeddings.float_]
 
         
     
