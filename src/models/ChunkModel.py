@@ -70,3 +70,11 @@ class ChunkModel(BaseDataModel):
                 result = await session.execute(stmt)
             await session.commit()
         return result.rowcount
+    
+
+    async def get_chunks_count_by_project_id(self, project_id:ObjectId):
+        async with self.db_client() as session:
+            count_query = select(func.count(DataChunk.id)).where(DataChunk.chunk_project_id == project_id)
+            result = await session.execute(count_query)
+            count = result.scalar_one()
+        return count
