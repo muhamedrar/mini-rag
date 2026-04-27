@@ -24,10 +24,11 @@ async def lifespan(app: FastAPI):
         class_=AsyncSession,
         expire_on_commit = False
     )
+    
     print("postgres db startup complete.")
 
     llm_factory = LLmFactory(settings)
-    vector_db_factory = VectorDbFactory(settings)
+    vector_db_factory = VectorDbFactory(settings, db_client=app.db_client)
 
 
     app.llm_client = llm_factory.create_provider(provider_name= settings.GENERATION_BACKEND)
@@ -40,7 +41,7 @@ async def lifespan(app: FastAPI):
 
 
     app.vector_db_client = vector_db_factory.create_provider(provider_name= settings.VECTOR_DB_BACKEND)
-    app.vector_db_client.connect()
+    await app.vector_db_client.connect()
     print("vector db startup complete")
 
     app.template_parser = TemplateParser(

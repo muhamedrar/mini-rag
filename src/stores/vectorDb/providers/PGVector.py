@@ -98,14 +98,13 @@ class PGVectorDb(VectorDbInterface):
 
 
     async def delete_collection(self, collection_name: str):
-        async with self.db_client as session:
+        async with self.db_client() as session:
              async with session.begin():
                 self.logger.info(f"Deleting collection : {collection_name}")
                 await session.execute(
-                        sql_text("""
-                            DROP table if EXISTS :collection_name
-                        """),
-                        {'collection_name':collection_name}
+                        sql_text(f"""
+                            DROP table if EXISTS {collection_name}
+                        """)
                         )
         return True
     
