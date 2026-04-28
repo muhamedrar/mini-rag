@@ -5,8 +5,13 @@ from controllers import ProjectController
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from typing import List
+from dataclasses import dataclass
 
-
+@dataclass
+class Document:
+    page_content : str
+    metadata : dict
 
 class ProcessController(BaseController):
     
@@ -45,12 +50,42 @@ class ProcessController(BaseController):
         if file_content is None:
             return None
 
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap_size,length_function=len)
+        
         
         content_list = [doc.page_content for doc in file_content]
         metadata_list = [doc.metadata for doc in file_content]
 
-        chunks = text_splitter.create_documents(content_list,metadatas=metadata_list)
+        # text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap_size,length_function=len)
+        # chunks = text_splitter.create_documents(content_list,metadatas=metadata_list)
+
+        chunks = self.simple_text_splitter(
+            text=content_list,
+            metadata=metadata_list,
+            chunk_size=chunk_size
+        )
 
         return chunks
     
+
+
+    def simple_text_splitter(self,text: List[str] , metadata: List[dict], chunk_size:int , splitter_tag: str = '\n' ):
+        full_text = ",".join(text)
+        lines = [doc .strip() for doc in full_text.split(splitter_tag) if len(doc.strip()) > 1]
+        chunks = []
+        current_chunk = ""
+
+        for line in lines:
+            current_chunk += line + splitter_tag
+            if len(current_chunk) >= chunk_size:
+                chunks.append(Document(
+                    page_content=current_chunk.strip(),
+                    metadata= {}
+                ))
+                current_chunk = ""
+        
+        if len(current_chunk) > 0:
+                chunks.append(Document(
+                    page_content=current_chunk.strip(),
+                    metadata= {}
+                ))
+        return chunks
