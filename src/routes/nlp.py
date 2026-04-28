@@ -71,7 +71,7 @@ async def index_project( request:Request,project_id: int, nlp_push_schema : NlpP
 
         do_reset = nlp_push_schema.do_reset if page_number == 1 else 0
 
-        chunks_ids = list(range(idx, idx + page_chunks_length))
+        chunks_ids = [chunk.id for chunk in page_chunks]
         idx += len(page_chunks)
 
         is_inserted = await nlp_controller.index_into_vector_db(

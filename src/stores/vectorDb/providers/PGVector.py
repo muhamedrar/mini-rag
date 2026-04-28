@@ -70,28 +70,26 @@ class PGVectorDb(VectorDbInterface):
 
         async with self.db_client() as session:
                     table_info = await session.execute(
-                        sql_text("""
-                            SELECT schemansessioname, tablename , tableowner, hasindexes
+                        sql_text(f"""
+                            SELECT schemaname, tablename , tableowner, hasindexes
                             FROM pg_tables 
-                            WHERE tablename = :collection_name
-                        """),
-                        {'collection_name':collection_name}
+                            WHERE tablename = {collection_name}
+                        """)
                         )
                     
                     count = await session.execute(
                         sql_text(f"""
-                            SELECT COUNT(*) FROM :collection_name
-                        """),
-                        {'collection_name':collection_name}
+                            SELECT COUNT(*) FROM {collection_name}
+                        """)
                     )
                     
                     table_data = table_info.fetchone()
                     count = count.scalar()
 
-                    if not table_info:
+                    if not table_data:
                         return None
                     return {
-                        "table_info": dict(table_data),
+                        "table_info": dict(table_data._mapping),
                         "table_count": count
                     }
         
@@ -206,6 +204,7 @@ class PGVectorDb(VectorDbInterface):
         if record_id == None:
             self.logger.error(f"Can not insert record with none CHUNK_ID : {collection_name}")
             return False
+            
 
         
         async with self.db_client() as session:
@@ -220,7 +219,7 @@ class PGVectorDb(VectorDbInterface):
                         "text": text,
                         "vector": '[' + ",".join([str(v) for v in vector]) + ']',
                         "chunk_id": record_id,
-                        "metadata": metadata or {}
+                        "metadata": metadata 
                     })
         self.logger.info(f"Record inserted successfully into  : {collection_name}")
         return True
@@ -257,7 +256,7 @@ class PGVectorDb(VectorDbInterface):
                                 "text": t,
                                 "vector": '[' + ",".join([str(v) for v in vec]) + ']',
                                 "chunk_id": rid,
-                                "metadata": md or {}
+                                "metadata": json.dumps(md)
                             }
                             for t, vec, rid, md in zip(batch_text, batch_vector, batch_record_ids, batch_metadata)
                         ])
@@ -298,5 +297,4 @@ class PGVectorDb(VectorDbInterface):
                      )
                     for record in records
                 ]
-        
-
+    

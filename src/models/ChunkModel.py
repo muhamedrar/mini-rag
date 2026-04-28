@@ -5,6 +5,7 @@ from bson.objectid import ObjectId
 from pymongo import InsertOne
 from sqlalchemy.future import select
 from sqlalchemy import func, delete
+from sqlalchemy.sql import text as sql_text
 
 
 class ChunkModel(BaseDataModel):
@@ -19,6 +20,8 @@ class ChunkModel(BaseDataModel):
         instance = cls(db_client)
         return instance
 
+    
+    
 
     async def create_chunk(self, chunk_data: DataChunk):
         async with self.db_client() as session:
@@ -27,6 +30,8 @@ class ChunkModel(BaseDataModel):
             await session.commit()
             await session.refresh(chunk_data)
         return chunk_data
+    
+
         
                 
 
