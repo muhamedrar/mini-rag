@@ -52,7 +52,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-    app.db_engine.dispose()
+    await app.db_engine.dispose()
     print("postgres db connection closed.")
 
     await app.vector_db_client.disconnect()

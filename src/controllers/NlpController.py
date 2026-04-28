@@ -66,7 +66,7 @@ class NlpController(BaseController):
 
         search_results = await self.vector_db_client.search_by_vector(
             collection_name=collection_name,
-            query=query_vector,
+            vector=query_vector,
             limit=limit
         )
 

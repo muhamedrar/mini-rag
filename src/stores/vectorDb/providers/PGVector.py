@@ -275,9 +275,9 @@ class PGVectorDb(VectorDbInterface):
                 seach_query = sql_text(f"""
                     SELECT 
                         {pgvectorTableSchema.TEXT.value} as text,
-                        1 - {pgvectorTableSchema.VECTOR.value} <-> :vector as score,
+                        1 - ({pgvectorTableSchema.VECTOR.value} <=> :vector) as score
                     FROM {collection_name}
-                    ORDER BY distance
+                    ORDER BY score DESC
                     LIMIT :limit
                 """)
 
