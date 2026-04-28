@@ -116,14 +116,16 @@ async def get_project_index_info(request:Request, project_id: int):
         collection_info = await nlp_controller.get_collection_info(project=project)
 
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
+            
             content={
-                "signal": ResponseSignal.VECTOR_DB_COLLECTION_INFO_SUCCESS.value,
+                
                 "collection_info": collection_info
             }
         )
-    except Exception:
+    except Exception as e:
+        print(f"Error fetching collection info for project {project_id}: {e}")
         return JSONResponse(
+                    status_code=status.HTTP_404_NOT_FOUND,
                     content={
                         "signal": ResponseSignal.VECTOR_DB_COLLECTION_NOT_FOUND.value
                             }

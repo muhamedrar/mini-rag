@@ -70,11 +70,12 @@ class PGVectorDb(VectorDbInterface):
 
         async with self.db_client() as session:
                     table_info = await session.execute(
-                        sql_text(f"""
+                        sql_text("""
                             SELECT schemaname, tablename , tableowner, hasindexes
                             FROM pg_tables 
-                            WHERE tablename = {collection_name}
-                        """)
+                            WHERE tablename = :collection_name
+                        """),
+                            {"collection_name": collection_name}
                         )
                     
                     count = await session.execute(

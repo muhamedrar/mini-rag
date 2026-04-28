@@ -26,7 +26,7 @@ class NlpController(BaseController):
     async def get_collection_info(self, project: Project):
         collection_name = self.create_collection_name(project_id=project.id)
         info = await self.vector_db_client.get_collection_info(collection_name=collection_name)
-        return info.dict()
+        return info
     
 
     async def index_into_vector_db(self, project: Project, chunk_ids:List[int] , data_chunks: list[DataChunk], do_reset: bool = False):
