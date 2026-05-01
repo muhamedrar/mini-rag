@@ -97,7 +97,6 @@ async def get_project_index_info(request:Request, project_id:str):
         collection_info = nlp_controller.get_collection_info(project=project)
 
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
             content={
                 "signal": ResponseSignal.VECTOR_DB_COLLECTION_INFO_SUCCESS.value,
                 "collection_info": collection_info
