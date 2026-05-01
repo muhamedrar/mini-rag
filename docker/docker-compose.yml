@@ -1,35 +1,36 @@
-version: '3'
-
 services:
-  mongodb:
-    image: mongo:8.0
-    container_name: mongodb
-    ports:
-      - "27007:27017"
-    volumes:
-    - mongodb_data:/data/db
-    networks:
-      - backend
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
 
+  # postgresSQL (pgvector)
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: pgvector-db
+    container_name: pgvector
     ports:
       - "5432:5432"
     volumes:
       - pgvector_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    env_file:
+      - ./env/.env.postgres
+    networks:
+      - backend
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    
+
+
+
+
+
+
+
 
 networks:
     backend:
 
 volumes:
-  mongodb_data:
   pgvector_data:
 
