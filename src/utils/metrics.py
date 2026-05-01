@@ -16,6 +16,14 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 
 
         REQUEST_COUNT.labels(method=request.method, endpoint=endpoint, status=response.status_code).inc()
-        REQUEST_LATENCY.labels(method=request.method, endpoint=endpoint).observe(duration)
+        REQUEST_LATENCY.labels(method=request.method, endpoCONTENT_TYPE_LATESTint=endpoint).observe(duration)
 
         return response
+    
+
+def setup_metrics(app: FastAPI):
+    app.add_middleware(MetricsMiddleware)
+
+    @app.get("/metrics_xyz",include_in_schema=False)
+    async def metrics():
+        return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
