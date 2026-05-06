@@ -26,6 +26,13 @@ services:
     container_name: postgres-exporter
     ports:
       - "9187:9187"
+    env_file:
+      - ./env/.env.postgres-exporter
+    depends_on:
+      - postgres
+    networks:
+      - backend
+    restart: always
 
   
     
