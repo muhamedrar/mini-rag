@@ -46,6 +46,14 @@ services:
     networks:
       - backend
     restart: always
+
+  prometheus:
+    image: prom/prometheus:v3
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
     
 
 
