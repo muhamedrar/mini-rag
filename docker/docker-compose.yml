@@ -1,5 +1,19 @@
 services:
 
+  # fastAPI APP
+  fastapi:
+    container_name: fastapi
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./env/.env.app
+    
   # postgresSQL (pgvector)
   postgres:
     image: pgvector/pgvector:pg16
@@ -61,8 +75,6 @@ services:
     command: 
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
       - '--web.enable-lifecycle' 
 
   # grafana dashboard
@@ -82,7 +94,24 @@ services:
       - backend
     restart: always
 
-
+  
+  node-exporter:
+    image: prom/node-exporter:v1
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - backend
+    restart: always
 
 
 
