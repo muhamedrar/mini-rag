@@ -137,6 +137,7 @@ services:
 
 networks:
     backend:
+      driver: bridge
 
 volumes:
   fastapi_data:
