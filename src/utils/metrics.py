@@ -16,7 +16,7 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 
 
         REQUEST_COUNT.labels(method=request.method, endpoint=endpoint, status=response.status_code).inc()
-        REQUEST_LATENCY.labels(method=request.method, endpoCONTENT_TYPE_LATESTint=endpoint).observe(duration)
+        REQUEST_LATENCY.labels(method=request.method, endpoint=endpoint).observe(duration)
 
         return response
     
